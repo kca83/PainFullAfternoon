@@ -14,11 +14,16 @@ public class ItemParserTest {
 
     private String rawSingleItemIrregularSeperatorSample = "naMe:MiLK;price:3.23;type:Food^expiration:1/11/2016##";
 
-    private String rawBrokenSingleItem =    "naMe:Milk;price:3.23;type:Food;expiration:1/25/2016##";
+    private String rawBrokenSingleItem =    "naMe:Milk;price:;type:Food;expiration:1/25/2016##";
 
     private String rawMultipleItems = "naMe:Milk;price:3.23;type:Food;expiration:1/25/2016##"
                                       +"naME:BreaD;price:1.23;type:Food;expiration:1/02/2016##"
                                       +"NAMe:BrEAD;price:1.23;type:Food;expiration:2/25/2016##";
+
+    private String cookies = "naMe:Cookies;price:2.25;type:Food%expiration:1/25/2016##"+
+                             "naMe:CoOkieS;price:2.25;type:Food*expiration:1/25/2016##"+
+                            "naMe:COokIes;price:2.25;type:Food;expiration:3/22/2016##"+
+                            "naMe:COOkieS;price:2.25;type:Food;expiration:1/25/2016##";
     private ItemParser itemParser;
 
     @Before
@@ -36,7 +41,7 @@ public class ItemParserTest {
 
     @Test
     public void parseStringIntoItemTest() throws ItemParseException{
-        Item expected = new Item("milk", 3.23, "food","1/25/2016");
+        Item expected = new Item("Milk", 3.23, "Food","1/25/2016");
         Item actual = itemParser.parseStringIntoItem(rawSingleItem);
         assertEquals(expected.toString(), actual.toString());
     }
@@ -58,5 +63,22 @@ public class ItemParserTest {
         Integer expected = 4;
         Integer actual = itemParser.findKeyValuePairsInRawItemData(rawSingleItemIrregularSeperatorSample).size();
         assertEquals(expected, actual);
+    }
+
+    @Test
+    public void parseStringArrayIntoItemsTest() {
+        Integer expected = 4;
+        ArrayList<String> lines = itemParser.parseRawDataIntoStringArray(cookies);
+        ArrayList<Item> items = new ArrayList<>();
+        for(String line : lines) {
+            try {
+                Item actual = itemParser.parseStringIntoItem(line);
+                items.add(actual);
+            } catch (ItemParseException ipe) {
+
+            }
+        }
+        Integer actual = items.size();
+        Assert.assertEquals(expected, actual);
     }
 }
